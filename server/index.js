@@ -2,10 +2,8 @@
 const express = require("express");
 const mongoose = require("mongoose");
 
-//IMPORTS FROM OTHER FILES
 const authRouter = require("./routes/auth");
 
-// INIT
 const PORT = 3000;
 const app = express();
 const DB = "mongodb://localhost:27017";
@@ -13,7 +11,6 @@ const DB = "mongodb://localhost:27017";
 app.use(express.json());
 app.use(authRouter);
 
-// CONNECTIONS
 mongoose
   .connect(DB)
   .then(() => {
@@ -23,6 +20,6 @@ mongoose
     console.log(e);
   });
 
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`Connected at port ${PORT}`);
 });
