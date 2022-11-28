@@ -15,12 +15,11 @@ class AuthService {
   bool get mounted => _element != null;
   get _element => null;
   // signup user
-  void signUpUser({
-    required BuildContext context,
-    required String email,
-    required String password,
-    required String name,
-  }) async {
+  void signUpUser(
+      {required BuildContext context,
+      required String email,
+      required String password,
+      required String name}) async {
     try {
       User user = User(
         id: '',
@@ -59,11 +58,10 @@ class AuthService {
   }
 
 // SignIn User
-  void signInUser({
-    required BuildContext context,
-    required String email,
-    required String password,
-  }) async {
+  void signInUser(
+      {required BuildContext context,
+      required String email,
+      required String password}) async {
     try {
       http.Response res = await http.post(
         Uri.parse('$uri/api/signin'),
@@ -97,9 +95,7 @@ class AuthService {
     }
   }
 
-  void getUserData({
-    required BuildContext context,
-  }) async {
+  void getUserData(BuildContext context) async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? token = prefs.getString('x-auth-token');
@@ -107,30 +103,28 @@ class AuthService {
       if (token == null) {
         prefs.setString('x-auth-token', '');
       }
-      // http.Response res = await http.post(
-      //   Uri.parse('$uri/api/signin'),
-      //   body: jsonEncode({'email': email, 'password': password}),
-      //   headers: <String, String>{
-      //     'Content-Type': 'application/json; charset=UTF-8',
-      //   },
-      // );
 
-      // httpErrorHandle(
-      //   response: res,
-      //   context: context,
-      //   onSuccess: () async {
-      //     SharedPreferences prefs = await SharedPreferences.getInstance();
-      //     if (mounted) return;
-      //     Provider.of<UserProvider>(context, listen: false).setUser(res.body);
-      //     await prefs.setString('X-auth-token', jsonDecode(res.body)['token']);
-      //     if (mounted) return;
-      //     Navigator.pushNamedAndRemoveUntil(
-      //       context,
-      //       HomeScreen.routeName,
-      //       (route) => false,
-      //     );
-      //   },
-      // );
+      var tokenRes = await http.post(Uri.parse('$uri/tokenIsValid'),
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+            'x-auth-token': token!
+          });
+
+      var response = jsonDecode(tokenRes.body);
+
+      if (response == true) {
+        http.Response userRes = await http.get(
+          Uri.parse('$uri/'),
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+            'x-auth-token': token
+          },
+        );
+
+        if (mounted) return;
+        var userProvider = Provider.of<UserProvider>(context, listen: false);
+        userProvider.setUser(userRes.body);
+      }
     } catch (e) {
       showSnackBar(
         context,

@@ -4,6 +4,7 @@ const bcryptjs = require("bcryptjs");
 const User = require("../models/user");
 const authRouter = express.Router();
 const jwt = require("jsonwebtoken");
+const auth = require("../middlewares/auth");
 
 authRouter.post("/api/signup", async (req, res) => {
   try {
@@ -64,6 +65,11 @@ authRouter.post("/tokenIsValid", async (req, res) => {
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
+});
+
+authRouter.get("/", auth, async (req, res) => {
+  const user = await User.findById(req.user);
+  res.json({ ...user._doc, token: req.token });
 });
 
 module.exports = authRouter;
