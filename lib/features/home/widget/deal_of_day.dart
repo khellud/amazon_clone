@@ -84,7 +84,7 @@ class _DealOfDayState extends State<DealOfDay> {
           ).copyWith(left: 15),
           alignment: Alignment.topLeft,
           child: Text(
-            'See all desls',
+            'See all details',
             style: TextStyle(
               color: Colors.cyan[800],
             ),
