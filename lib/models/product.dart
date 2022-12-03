@@ -5,7 +5,7 @@ import 'dart:convert';
 class Product {
   final String name;
   final String description;
-  final double quantity;
+  final int quantity;
   final String category;
   final double price;
   final String? id;
@@ -34,14 +34,14 @@ class Product {
 
   factory Product.fromMap(Map<String, dynamic> map) {
     return Product(
-      name: map['name'] as String,
-      description: map['description'] as String,
-      quantity: map['quantity'] as double,
-      category: map['category'] as String,
-      price: map['price'] as double,
-      id: map['_id'] != null ? map['id'] as String : null,
+      name: map["name"],
+      description: map["description"],
+      quantity: map["quantity"],
+      category: map["category"],
+      id: map["_id"],
+      price: map["price"].toDouble(),
       images: List<String>.from(
-        (map['images'] as List<String>),
+        (map['images']),
       ),
     );
   }
