@@ -7,7 +7,7 @@ class Product {
   final String description;
   final int quantity;
   final String category;
-  final double price;
+  final int price;
   final String? id;
   final List<String> images;
   final List<Rating>? rating;
@@ -42,7 +42,7 @@ class Product {
       quantity: map["quantity"],
       category: map["category"],
       id: map["_id"],
-      price: map["price"].toDouble(),
+      price: map["price"],
       images: List<String>.from(
         (map['images']),
       ),
