@@ -13,10 +13,10 @@ productRouter.get("/api/products", auth, async (req, res) => {
   }
 });
 
-productRouter.get("/api/products/search/:name", auth, async (req, res) => {
+productRouter.get("/api/products/search/", auth, async (req, res) => {
   try {
     const products = await Product.find({
-      name: { $regex: req.params.name, $options: "i" },
+      name: { $regex: req.query.q, $options: "i" },
     });
     res.json(products);
   } catch (e) {

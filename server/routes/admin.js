@@ -2,6 +2,7 @@ const express = require("express");
 const adminRouter = express.Router();
 const admin = require("../middlewares/admin");
 const { Product } = require("../models/product");
+const Order = require("../models/order");
 
 adminRouter.post("/admin/add-product", admin, async (req, res) => {
   try {
@@ -41,5 +42,77 @@ adminRouter.post("/admin/delete-product", admin, async (req, res) => {
     res.status(500).json({ error: e.message });
   }
 });
+
+adminRouter.get("/admin/get-orders", admin, async (req, res) => {
+  try {
+    const orders = await Order.find({});
+    res.json(orders);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+adminRouter.post("/admin/change-order-status", admin, async (req, res) => {
+  try {
+    const { id, status } = req.body;
+
+    let order = await Order.findById(id);
+
+    order.status = status;
+    order = await order.save();
+    res.json(order);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+adminRouter.get("/admin/analytics", admin, async (req, res) => {
+  try {
+    const orders = await Order.find({});
+    let totalEarnings = 0;
+    for (let i = 0; i < orders.length; i++) {
+      for (let j = 0; j < orders[i].products.length; j++) {
+        totalEarnings +=
+          orders[i].products[j].quantity * orders[i].products[j].product.price;
+      }
+    }
+
+    let mobileEarnings = await fetchCatagoryWiseProduct("Mobiles");
+    let essentialEarnings = await fetchCatagoryWiseProduct("Essentials");
+    let applianceEarnings = await fetchCatagoryWiseProduct("Appliances");
+    let booksEarnings = await fetchCatagoryWiseProduct("Books");
+    let fashionEarnings = await fetchCatagoryWiseProduct("Fashion");
+
+    let earnings = {
+      totalEarnings,
+      mobileEarnings,
+      essentialEarnings,
+      applianceEarnings,
+      booksEarnings,
+      fashionEarnings,
+    };
+
+    res.json(earnings);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+async function fetchCatagoryWiseProduct(category) {
+  let earnings = 0;
+  let catagoryOrders = await Order.find({
+    "products.product.category": category,
+  });
+
+  for (let i = 0; i < catagoryOrders.length; i++) {
+    for (let j = 0; j < catagoryOrders[i].products.length; j++) {
+      earnings +=
+        catagoryOrders[i].products[j].quantity *
+        catagoryOrders[i].products[j].product.price;
+    }
+  }
+
+  return earnings;
+}
 
 module.exports = adminRouter;
